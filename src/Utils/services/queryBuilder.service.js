@@ -1,0 +1,1 @@
+export default function  queryBuilder(tableName, params) { return `SELECT * from ${tableName}` }
