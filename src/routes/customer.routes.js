@@ -1,12 +1,12 @@
 import { Router } from "express"
 import {getCustomers, insertCustomers, updateCustomers} from '../controllers/customer.controller.js'
-import { validateCustomerSchema } from "../middlewares/validateUserSchema.middleware.js"
+import { validateSchema } from "../middlewares/validateSchema.middleware.js"
 import {customersSchema} from '../schemas/customer.schema.js'
 
 const customerRouter = Router()
 
 customerRouter.get("/customers", getCustomers)
-customerRouter.post("/customers", validateCustomerSchema(customersSchema),  insertCustomers)
+customerRouter.post("/customers", validateSchema(customersSchema),  insertCustomers)
 customerRouter.put("/customers/:id", updateCustomers)
 
 
