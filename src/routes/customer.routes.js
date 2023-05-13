@@ -7,7 +7,7 @@ import {customersSchema} from '../schemas/customer.schema.js'
 const customerRouter = Router()
 
 customerRouter.get("/customers", getCustomers)
-customerRouter.post("/customers", validateCustomerSchema(customersSchema),/*searchCustomer(),*/   insertCustomers)
+customerRouter.post("/customers", validateCustomerSchema(customersSchema),  insertCustomers)
 customerRouter.put("/customers/:id", updateCustomers)
 
 
