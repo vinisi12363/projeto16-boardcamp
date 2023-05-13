@@ -53,4 +53,4 @@ export async function insertGames(req, res) {
     res.status(201).send("Game criado com sucesso")
 }
 
-export default getGames
+export default {getGames, insertGames}
