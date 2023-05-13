@@ -13,7 +13,9 @@ export async function getGames(req, res) {
 export async function insertGames(req, res) {
     const { stockTotal, pricePerDay, name, image } = req.body
     console.log("BODY", req.body)
-
+    if (!stockTotal || !pricePerDay || !name || !image) return res.status(400)
+    if (stockTotal <= 0 || pricePerDay<= 0 || image ==='' || name === '') return res.status(400)
+    
     const QUERY = `
         INSERT INTO games (
             "stockTotal",

@@ -12,7 +12,8 @@ export async function getCustomers(req, res) {
 }
 export async function insertCustomers(req, res) {
     const { birthday, cpf, name, phone } = req.body
-    
+    if(!birthday || !cpf || !name || !phone) return res.status(400)
+    if (birthday === '' || cpf=== '' || phone==='' || name === '') return res.status(400)
 
     try {
         await db.query(`
