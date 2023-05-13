@@ -1,5 +1,5 @@
 import { db } from "../config/connectdbConfig.js"
-import queryBuilder from '../Utils/services/queryBuilder.service.js'
+import queryBuilder from './Utils/queryBuilder.service.js'
 
 export async function getGames(req, res) {
     try {
