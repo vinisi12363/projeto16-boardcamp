@@ -3,8 +3,11 @@ import queryBuilder from './Utils/queryBuilder.service.js'
 import dayjs from "dayjs"
 
 export async function getCustomers(req, res) {
-    try {
-        const customers = await db.query(queryBuilder('customers'))
+     const {id}=req.params
+    
+    
+     try {
+        const customers = await db.query(queryBuilder('customers', id))
         
         res.status(200).send(customers.rows)
     } catch (err) {
@@ -14,16 +17,17 @@ export async function getCustomers(req, res) {
 
 }
 export async function insertCustomers(req, res) {
+    try {  
     const { birthday, cpf, name, phone } = req.body
-    if(!birthday || !cpf || !name || !phone) return res.status(400)
-    if (birthday === '' || cpf=== '' || phone==='' || name === '') return res.status(400)
-   
-
-
-
     const date = new Date(birthday).toISOString().split('T')[0]
-    console.log("DATA : ",date)
-    try {     
+
+    if(!birthday || !cpf || !name || !phone) return res.status(400)
+    else if (birthday === '' || cpf=== '' || phone==='' || name === '') return res.status(400)
+   
+    const customerExist = await db.query(`SELECT * FROM customers WHERE cpf = $1;`,[cpf])
+    console.log( customerExist)  
+    
+    if (customerExist.rows.length === 0) {
             await db.query(`
             INSERT INTO customers (
                 name,
@@ -36,11 +40,15 @@ export async function insertCustomers(req, res) {
                 $2,
                 $3,
                 $4
-    
+
             )
-        `, [name, phone, cpf, date])
-        
-   
+            `, [name, phone, cpf, date])
+     }
+     else if (customerExist.rows.length > 0 ){
+        return res.status(409).send("Customer is already registered")
+     }
+
+          
     } catch (err) {
         res.status(500).send(err.message)
     }
