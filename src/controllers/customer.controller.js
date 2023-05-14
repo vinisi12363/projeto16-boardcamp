@@ -86,7 +86,7 @@ export async function updateCustomers(req, res) {
     } catch (err) {
         res.status(500).send(err.message)
     }
-    res.status(201).send("Customer alterado  com sucesso")
+    res.status(200).send("Customer alterado  com sucesso")
 }
 
 export default {getCustomers, insertCustomers}
