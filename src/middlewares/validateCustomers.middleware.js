@@ -2,6 +2,8 @@
 export default function validateCustomer(schema) {
  
     return (req, res, next) => {
+
+        /*
         const { birthday, cpf, name, phone } = req.body
            
         if(!birthday || !cpf || !name || !phone) return res.status(400)
@@ -24,7 +26,7 @@ export default function validateCustomer(schema) {
                 return res.status(400).send('O nome não pode estar vazio.');
             }
             return res.status(422).send(errors)
-        }
+        } */
         const {error} = schema.validate(req.body, { abortEarly: false })
     
         if (error) {

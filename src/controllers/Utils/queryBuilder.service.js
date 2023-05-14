@@ -11,8 +11,8 @@ export default function  queryBuilder(tableName, params) {
         query = `SELECT  id, name, phone , cpf, TO_CHAR(birthday, 'YYYY-MM-DD') AS birthday  FROM  customers`;
     
     }
-
-    
+    else if (tableName === 'games')
+        query = `SELECT * FROM games`
     return query
 
 }

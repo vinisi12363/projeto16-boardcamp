@@ -6,13 +6,15 @@ export async function getRentals(req, res) {
  
 }
 export async function insertRentals(req, res) {
-  
+  try{
+    
+  }catch(err){}
 }
 
 export async function updateRentals(req, res) {
-  
+    try {}catch(err){}
 }
 export async function deleteRentals(req, res) {
-    
+    try {}catch(err){}
 }
 

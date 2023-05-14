@@ -2,6 +2,7 @@
 export default function validateGame(schema) {
  
     return (req, res, next) => {
+        /*
         const { stockTotal, pricePerDay, name, image } = req.body
            
         if(!stockTotal || !pricePerDay || !name || !image) return res.status(400)
@@ -25,6 +26,7 @@ export default function validateGame(schema) {
             }
             return res.status(422).send(errors)
         }
+        */
         const {error} = schema.validate(req.body, { abortEarly: false })
     
         if (error) {
