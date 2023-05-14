@@ -5,10 +5,13 @@ import dayjs from "dayjs"
 export async function getCustomers(req, res) {
     try {
         const customers = await db.query(queryBuilder('customers'))
+        
         res.status(200).send(customers.rows)
     } catch (err) {
         res.status(500).send(err.message)
     }
+
+
 }
 export async function insertCustomers(req, res) {
     const { birthday, cpf, name, phone } = req.body
