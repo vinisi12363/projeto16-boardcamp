@@ -20,11 +20,7 @@ export async function insertCustomers(req, res) {
 
     const date = new Date(birthday).toISOString().split('T')[0]
     console.log("DATA : ",date)
-    try {       
-            const cpfChecker = await db.query(`SELECT * FROM customers WHERE cpf = $1;`,[cpf])
-            console.log("CPFCHECKER:", cpfChecker)
-            if(cpfChecker.rows.length > 0) return res.status(409).send("user already registered!")
-
+    try {     
             await db.query(`
             INSERT INTO customers (
                 name,

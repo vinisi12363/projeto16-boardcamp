@@ -7,7 +7,7 @@ import searchGame from '../middlewares/searchGameAlreadyExists.middleware.js'
 const gamesRouter = Router()
 
 gamesRouter.get("/games", getGames)
-gamesRouter.post("/games", validateSchema(gameSchema),  insertGames)
+gamesRouter.post("/games", validateSchema(gameSchema), searchGame,   insertGames)
 
 
 export default gamesRouter
