@@ -1,26 +1,36 @@
 
-export function validateGame(schema) {
+export default function validateRental(schema) {
  
     return (req, res, next) => {
-        const { stockTotal, pricePerDay, name, image } = req.body
+        const { customerId, gameId, rentDate, daysRented,  returnDate , originalPrice, delayFee} = req.body
            
-        if(!stockTotal || !pricePerDay || !name || !image) return res.status(400)
-        else if (stockTotal <0 || pricePerDay< 0 || image==='' || name === '') return res.status(400)
+        if(!customerId || !gameId || !rentDate || !daysRented ||!returnDate || !originalPrice || !delayFee ) return res.status(400)
+        
+        else if (customerId <0 || gameId< 0 || rentDate==='' || daysRented === '' || returnDate=== ''  ||originalPrice < 0  ) return res.status(400)
         
         const validation = schema.validate(req.body, { abortEarly: false })
 
         if (validation.error) {
             const errors = validation.error.details.map(detail => detail.message) 
-            if (errors.details.some(error => error.message === '"stockTotal" is not allowed to be empty.')) {
+            if (errors.details.some(error => error.message === '"customerId" is not allowed to be empty.')) {
                 return res.status(400).send('O nome não pode estar vazio.');
             }
-            else if (errors.details.some(error => error.message === '"pricePerDay" is not allowed to be empty.')) {
+            else if (errors.details.some(error => error.message === '"gameId" is not allowed to be empty.')) {
                 return res.status(400).send('O nome não pode estar vazio.');
             }
-            else if (errors.details.some(error => error.message === '"name" is not allowed to be empty.')) {
+            else if (errors.details.some(error => error.message === '"rentDate" is not allowed to be empty.')) {
                 return res.status(400).send('O nome não pode estar vazio.');
             }
-           else if (errors.details.some(error => error.message === '"image" is not allowed to be empty.')) {
+           else if (errors.details.some(error => error.message === '"daysRented" is not allowed to be empty.')) {
+                return res.status(400).send('O nome não pode estar vazio.');
+            }
+            else if (errors.details.some(error => error.message === '"returnDate" is not allowed to be empty.')) {
+                return res.status(400).send('O nome não pode estar vazio.');
+            }
+            else if (errors.details.some(error => error.message === '"originalPrice" is not allowed to be empty.')) {
+                return res.status(400).send('O nome não pode estar vazio.');
+            }
+            else if (errors.details.some(error => error.message === '"delayFee" is not allowed to be empty.')) {
                 return res.status(400).send('O nome não pode estar vazio.');
             }
             return res.status(422).send(errors)
