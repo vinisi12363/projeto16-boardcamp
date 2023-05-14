@@ -1,14 +1,26 @@
 import { db } from "../config/connectdbConfig.js"
 import queryBuilder from './Utils/queryBuilder.service.js'
-import dayjs from "dayjs"
+
 
 export async function getCustomers(req, res) {
-     const {id}=req.params
-    
-    
-     try {
+
+    try { 
+       
+        const customers = await db.query(queryBuilder('customers'))
+        res.status(200).send(customers.rows)
+    } catch (err) {
+        res.status(500).send(err.message)
+    }
+
+
+}
+
+export async function getCustomersById(req, res) {
+
+    try { 
+        const {id}=req.params
         const customers = await db.query(queryBuilder('customers', id))
-        
+     
         res.status(200).send(customers.rows)
     } catch (err) {
         res.status(500).send(err.message)
@@ -89,4 +101,4 @@ export async function updateCustomers(req, res) {
     res.status(200).send("Customer alterado  com sucesso")
 }
 
-export default {getCustomers, insertCustomers}
+export default {getCustomers,getCustomersById , insertCustomers, updateCustomers}
