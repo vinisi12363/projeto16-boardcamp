@@ -96,7 +96,7 @@ export async function insertRentals(req, res) {
       
 
         if (!result.rows.length) return res.status(500).send("Error inserting new rental")
-        return res.status(200).send(result.rows[0])
+        return res.status(201).send(result.rows[0])
      
       }else if(gameData.rows[0].stockTotal <= 0) {
           return res.status(400).send("erro jogo indisponivel")
@@ -108,8 +108,36 @@ export async function insertRentals(req, res) {
       console.error("Error inserting new rental", err);
       throw err;
     }
-  }
+}
+
+export async function finalizeRentals(req, res){
+  try{
+    const {rentId} = req.params;
   
+    const rentalInfo = db.query (`SELECT * FROM rentals where id = $1`, [rentId])
+    if (!rentalInfo.rows.length) return res.status(400).send("rental not found");
+    
+    const rentDate = rentalInfo.rows[0].rentDate;
+
+    const returnDate =  rentDate.add(rentalInfo.rows[0].daysRented , 'day').format('YYYY-MM-DD')
+    
+    const actualDate= returnDate.diff(rentDate, 'day')
+
+
+      if (actualDate > returnDate){
+        const extraDays = daysRented - expectedDaysRented
+       
+        const delayFee = extraDays * pricePerDay
+        
+      }
+
+
+
+
+
+  }catch(err){}
+
+}
 export async function calculateRentals(id, returnDate, delayFee) {
         try{
           const result = await client.query(
