@@ -77,7 +77,10 @@ export async function updateCustomers(req, res) {
     try {
 
         const customerData = await db.query(`SELECT * FROM customers WHERE id = '${id}'`)
-         
+        
+        const cpfChecker = await db.query(`SELECT * from customers where cpf = '${cpf}'`)
+        
+        if (cpfChecker && cpfChecker.rows[0].id !== id) return res.status(409).send("cpf already in use")
         
          if (customerData.rows.length>0){
                 

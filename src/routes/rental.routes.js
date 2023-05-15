@@ -1,6 +1,6 @@
 import { Router } from "express"
 import {getRentals, insertRentals, calculateRentals, deleteRentalsById} from '../controllers/rentals.controller.js'
-import  validateRental  from "../middlewares/validateRental.middleware.js"
+import  validateRental  from "../middlewares/validateGame.middleware.js"
 import { rentalSchema } from "../schemas/rental.schema.js"
 
 
