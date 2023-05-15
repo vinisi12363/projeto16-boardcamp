@@ -114,6 +114,12 @@ export async function finalizeRentals(req, res) {
 
     if (!rentalInfo.rows.length) return res.status(404).send("Rental not found");
 
+    const rentalChecker = await db.query(`SELECT id, "returnDate" FROM rentals WHERE id = $1;`,[id])
+    
+    if(rentalChecker.rows[0].returnDate !== null) {
+      return res.status(400).send("this rental already finalized")
+    }
+
     const gameId = rentalInfo.rows[0].gameId;
     const gameData = await db.query(`SELECT id, name, "pricePerDay", "stockTotal" FROM games WHERE id = $1`, [gameId]);
     if (!gameData.rows.length) return res.status(400).send("Game not found");
