@@ -7,7 +7,7 @@ import { rentalSchema } from "../schemas/rental.schema.js"
 const rentalsRouter = Router()
 
 rentalsRouter.get("/rentals", getRentals)
-rentalsRouter.post("/rentals", validateRental(rentalSchema),  insertRentals)
+rentalsRouter.post("/rentals", insertRentals)
 rentalsRouter.put("/rentals", validateRental(rentalSchema),  calculateRentals)
 rentalsRouter.delete("/rentals/:id", validateRental(rentalSchema), deleteRentalsById)
 
