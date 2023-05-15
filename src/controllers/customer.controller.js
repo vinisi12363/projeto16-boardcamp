@@ -97,7 +97,7 @@ export async function updateCustomers(req, res) {
                 birthday = '${birthday}' 
               WHERE id = ${id};
             `)
-          
+            res.status(200).send("Customer alterado  com sucesso")
         }else{
             return res.status(409).send("cpf already in use")
         }
