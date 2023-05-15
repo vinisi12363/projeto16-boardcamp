@@ -130,13 +130,13 @@ export async function finalizeRentals(req, res) {
 
     const diff = Math.abs(today.getTime() - rentDate.getTime());
 
-    const extraDays = Math.abs(diff / oneDay); // Usando ceil para arredondar para cima
+    const extraDays = Math.abs(diff / oneDay); 
     
     let delayFee = null
-    if (extraDays > 1){
-       delayFee = Math.max(0,extraDays * gameData.rows[0].pricePerDay);
-      //const delayFee =  (rentalInfo.rows[0].daysRented - extradays ) * gameData.rows[0].pricePerDay);
-    }
+    
+       
+      delayFee = Math.max(0, ( rentalInfo.rows[0].daysRented - extraDays ) * gameData.rows[0].pricePerDay); 
+    
     
 
     
