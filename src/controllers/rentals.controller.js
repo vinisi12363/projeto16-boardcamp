@@ -1,16 +1,4 @@
-import { db } from "../config/connectdbConfig.js"
-import queryBuilder from './Utils/queryBuilder.service.js'
-import dayjs from "dayjs"
-import utc from 'dayjs/plugin/utc.js';
-import timezone from 'dayjs/plugin/timezone.js';
-
-// Load the Day.js plugins
-dayjs.extend(utc);
-dayjs.extend(timezone);
-
-// Set the timezone to GMT-3
-dayjs.tz.setDefault('America/Sao_Paulo');
-
+import { db } from "../config/connectdbConfig.js";
 
 async function searchRentals(params){
       const   { customerId,
@@ -143,25 +131,14 @@ export async function finalizeRentals(req, res) {
     
     const oneDay = 24 * 60 * 60 * 1000 ; 
     const today  =  new Date();
-    const timezone = +3;
     const rentDate = rentalInfo.rows[0].rentDate;
     console.log ("RENTDATE", rentDate , " RENT DATE GETTIME", rentDate.getTime()) 
     const diff = Math.abs(today.getTime() - rentDate.getTime())
     const extraDays = Math.round(diff /oneDay)
     let delayFee = Math.max((extraDays - rentalInfo.rows[0].daysRented)* gameData.rows[0].pricePerDay)
 
-    await db.query(`
-      UPDATE rentals
-      SET
-        "customerId" = ${rentalInfo.rows[0].customerId},
-        "gameId" = ${rentalInfo.rows[0].gameId},
-        "rentDate" = '${rentalInfo.rows[0].rentDate}',
-        "daysRented" = ${rentalInfo.rows[0].daysRented},
-        "returnDate" = '${today}',
-        "originalPrice" = ${rentalInfo.rows[0].originalPrice},
-        "delayFee" = ${delayFee}
-      WHERE id = ${id};
-    `);
+    await db.query('UPDATE rentals SET "returnDate"=$1, "delayFee"=$2 WHERE id=$3 RETURNING *',
+    [today, delayFee, id]);
 
     try {
       await db.query(`UPDATE games SET "stockTotal" = "stockTotal" + 1 WHERE id = $1`, [gameId]);
@@ -171,6 +148,8 @@ export async function finalizeRentals(req, res) {
 
     console.log("FINALIZED RENTAL", rentalInfo.rows);
     res.status(200).send(rentalInfo.rows[0]);
+  
+  
   } catch (err) {
     console.error("Error finalizing rental", err);
     res.status(500).send(err.message);
