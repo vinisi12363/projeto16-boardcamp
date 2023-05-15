@@ -2,7 +2,10 @@
 export default function validateRental(schema) {
  
     return (req, res, next) => {
- 
+        const { stockTotal, pricePerDay, name, image } = req.body
+        if (!stockTotal || !pricePerDay || !name || !image) return res.status(400)
+        if (stockTotal <= 0 || pricePerDay<= 0 || image ==='' || name === '') return res.status(400)
+        
         const {error} = schema.validate(req.body, { abortEarly: false })
     
         if (error) {

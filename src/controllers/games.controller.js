@@ -12,9 +12,8 @@ export async function getGames(req, res) {
 }
 export async function insertGames(req, res) {
     try {
-    const { stockTotal, pricePerDay, name, image } = req.body
-    if (!stockTotal || !pricePerDay || !name || !image) return res.status(400)
-    if (stockTotal <= 0 || pricePerDay<= 0 || image ==='' || name === '') return res.status(400)
+         const { stockTotal, pricePerDay, name, image } = req.body
+
 
         const gameData = await db.query(`SELECT * FROM games WHERE name = '${name}'`)
         console.log ('GAME DATA', gameData)
