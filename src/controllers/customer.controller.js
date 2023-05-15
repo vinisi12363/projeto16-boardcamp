@@ -19,9 +19,16 @@ export async function getCustomersById(req, res) {
 
     try { 
         const {id}=req.params
+        if (!id) return res.status(400).send('error')
+        
         const customers = await db.query(queryBuilder('customers', id))
-     
-        res.status(200).send(customers.rows[0])
+        console.log (customers)
+        if(customers === [] || customers.rows.length===0){
+            return res.status(400).send('error')
+        } else {
+            res.status(200).send(customers.rows[0])
+        }
+      
     } catch (err) {
         res.status(500).send(err.message)
     }
@@ -76,6 +83,7 @@ export async function updateCustomers(req, res) {
     if (birthday === '' || cpf=== '' || phone==='' || name === '') return res.status(400)
 
         if (name.length === 0 || name === '' || !id) return res.status(400)
+
         const customerData = await db.query(`SELECT * FROM customers WHERE id = '${id}'`)
         
         const cpfChecker = await db.query(`SELECT * from customers where cpf = '${cpf}'`)

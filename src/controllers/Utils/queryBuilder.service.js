@@ -13,6 +13,7 @@ export default function  queryBuilder(tableName, params) {
     }
     else if (tableName === 'games')
         query = `SELECT * FROM games`
+    
     return query
 
 }
