@@ -84,7 +84,9 @@ export async function insertRentals(req, res) {
       let returnDate = null;
       let originalPrice = gameData.rows[0].pricePerDay * daysRented;
       let delayFee = null;
-     
+      if(gameData.rows[0].stockTotal <= 0) {
+        return res.status(400).send("erro jogo indisponivel")
+      }
       if(gameData.rows[0].stockTotal > 0){
         const result = await db.query({
           text: 'INSERT INTO rentals("customerId", "gameId", "rentDate", "daysRented", "returnDate", "originalPrice", "delayFee") VALUES($1, $2, $3, $4, $5, $6, $7) RETURNING *',
@@ -109,8 +111,6 @@ export async function insertRentals(req, res) {
         if (!result.rows.length) return res.status(500).send("Error inserting new rental")
         return res.status(201).send(result.rows[0])
      
-      }else if(gameData.rows[0].stockTotal <= 0) {
-          return res.status(400).send("erro jogo indisponivel")
       }
     
 
