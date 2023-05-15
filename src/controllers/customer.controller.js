@@ -85,12 +85,9 @@ export async function updateCustomers(req, res) {
         if (name.length === 0 || name === '' || !id) return res.status(400)
 
         const customerData = await db.query(`SELECT * FROM customers WHERE id = '${id}'`)
-        
-        const cpfChecker = await db.query(`SELECT * from customers where cpf = '${cpf}'`)
-        
-        if (cpfChecker && cpfChecker.rows[0].id !== id) return res.status(409).send("cpf already in use")
-       
-        if (customerData.rows.length>0){
+        console.log("customer dentro do update:  ", customerData)
+        console.log("CUSTOMER CPF", customerData.rows[0].cpf)
+        if (customerData.rows.length>0 && cpf === customerData.rows[0].cpf){
                 
             await db.query(`
             UPDATE customers SET
@@ -100,8 +97,10 @@ export async function updateCustomers(req, res) {
                 birthday = '${birthday}' 
               WHERE id = ${id};
             `)
-
-         }
+          
+        }else{
+            return res.status(409).send("cpf already in use")
+        }
        
          
         
