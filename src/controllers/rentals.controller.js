@@ -1,6 +1,15 @@
 import { db } from "../config/connectdbConfig.js"
 import queryBuilder from './Utils/queryBuilder.service.js'
 import dayjs from "dayjs"
+import utc from 'dayjs/plugin/utc.js';
+import timezone from 'dayjs/plugin/timezone.js';
+
+// Load the Day.js plugins
+dayjs.extend(utc);
+dayjs.extend(timezone);
+
+// Set the timezone to GMT-3
+dayjs.tz.setDefault('America/Sao_Paulo');
 
 
 async function searchRentals(params){
@@ -68,8 +77,10 @@ export async function insertRentals(req, res) {
   
       let gameData = await db.query(`SELECT id, name, "pricePerDay", "stockTotal" FROM games WHERE id = $1`, [gameId]);
       if (!gameData.rows.length) return res.status(400).send("Game not found");
+
       console.log("gamedata: ", gameData)
-      const rentDate = dayjs().format('YYYY-MM-DD');
+      const rentDate = new Date();
+      console.log("rent Date", rentDate, "rent GETTIME" , rentDate.getTime())
       let returnDate = null;
       let originalPrice = gameData.rows[0].pricePerDay * daysRented;
       let delayFee = null;
@@ -110,34 +121,62 @@ export async function insertRentals(req, res) {
     }
 }
 
-export async function finalizeRentals(req, res){
-  try{
-    const {rentId} = req.params;
-  
-    const rentalInfo = db.query (`SELECT * FROM rentals where id = $1`, [rentId])
-    if (!rentalInfo.rows.length) return res.status(400).send("rental not found");
+export async function finalizeRentals(req, res) {
+  try {
+    const { id } = req.params;
+    let  query1 = `
+        SELECT 
+          "customerId", "gameId", "daysRented", "returnDate", "originalPrice", "delayFee",
+          TO_CHAR("rentDate", 'YYYY-MM-DD') AS "rentDate"
+        FROM rentals
+        WHERE id = ${id}
+      `
+    let query2= `SELECT * FROM rentals WHERE id = ${id}`
     
+    const rentalInfo = await db.query(query2);
+    console.log("RENTAL INFO", rentalInfo)
+    if (!rentalInfo.rows.length) return res.status(404).send("Rental not found");
+
+    const gameId = rentalInfo.rows[0].gameId;
+    let gameData = await db.query(`SELECT id, name, "pricePerDay", "stockTotal" FROM games WHERE id = $1`, [gameId]);
+    if (!gameData.rows.length) return res.status(400).send("Game not found");
+    
+    const oneDay = 24 * 60 * 60 * 1000 ; 
+    const today  =  new Date();
+    const timezone = +3;
     const rentDate = rentalInfo.rows[0].rentDate;
+    console.log ("RENTDATE", rentDate , " RENT DATE GETTIME", rentDate.getTime()) 
+    const diff = Math.abs(today.getTime() - rentDate.getTime())
+    const extraDays = Math.round(diff /oneDay)
+    let delayFee = Math.max((extraDays - rentalInfo.rows[0].daysRented)* gameData.rows[0].pricePerDay)
 
-    const returnDate =  rentDate.add(rentalInfo.rows[0].daysRented , 'day').format('YYYY-MM-DD')
-    
-    const actualDate= returnDate.diff(rentDate, 'day')
+    await db.query(`
+      UPDATE rentals
+      SET
+        "customerId" = ${rentalInfo.rows[0].customerId},
+        "gameId" = ${rentalInfo.rows[0].gameId},
+        "rentDate" = '${rentalInfo.rows[0].rentDate}',
+        "daysRented" = ${rentalInfo.rows[0].daysRented},
+        "returnDate" = '${today}',
+        "originalPrice" = ${rentalInfo.rows[0].originalPrice},
+        "delayFee" = ${delayFee}
+      WHERE id = ${id};
+    `);
 
+    try {
+      await db.query(`UPDATE games SET "stockTotal" = "stockTotal" + 1 WHERE id = $1`, [gameId]);
+    } catch (err) {
+      return res.status(500).send(err.message);
+    }
 
-      if (actualDate > returnDate){
-        const extraDays = daysRented - expectedDaysRented
-       
-        const delayFee = extraDays * pricePerDay
-        
-      }
-
-
-
-
-
-  }catch(err){}
-
+    console.log("FINALIZED RENTAL", rentalInfo.rows);
+    res.status(200).send(rentalInfo.rows[0]);
+  } catch (err) {
+    console.error("Error finalizing rental", err);
+    res.status(500).send(err.message);
+  }
 }
+
 export async function calculateRentals(id, returnDate, delayFee) {
         try{
           const result = await client.query(
@@ -154,7 +193,15 @@ export async function calculateRentals(id, returnDate, delayFee) {
 export async function deleteRentalsById(req, res) {
     const {id} =req.params;
     try {
-      await db.query (`DELETE FROM rentals WHERE id=$1`, [id])
+      const rentalData = await db.query (`SELECT * FROM rentals WHERE id=$1`, [id])
+      if (!rentalData.rows.length) return res.status(404).send("Rental not found");
+
+      if(rentalData.rows[0].returnDate !== null) {
+        await db.query("DELETE * FROM rentals where id = $1", [id])
+      }else{
+        return res.status(400).send("erro ao tentar excluir um rental")
+      }
+      res.status(200)
     }catch(err){res.status(500).send(err.message)}
 }
 
