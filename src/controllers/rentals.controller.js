@@ -129,9 +129,15 @@ export async function finalizeRentals(req, res) {
     const rentDate = new Date(rentalInfo.rows[0].rentDate);
 
     const diff = Math.abs(today.getTime() - rentDate.getTime());
-    const extraDays = Math.ceil(diff / oneDay); // Usando ceil para arredondar para cima
-    const delayFee = Math.max(0,extraDays * gameData.rows[0].pricePerDay);
-    //const delayFee =  (extraDays - rentalInfo.rows[0].daysRented) * gameData.rows[0].pricePerDay);
+
+    const extraDays = Math.abs(diff / oneDay); // Usando ceil para arredondar para cima
+    
+    let delayFee = null
+    if (extraDays > 1){
+       delayFee = Math.max(0,extraDays * gameData.rows[0].pricePerDay);
+      //const delayFee =  (rentalInfo.rows[0].daysRented - extradays ) * gameData.rows[0].pricePerDay);
+    }
+    
 
     
     console.log("oneDay", oneDay, "today.getTime()", today.getTime(), "rentDate.getTime()", rentDate.getTime(), "today.getTime() - rentDate.getTime()", today.getTime() - rentDate.getTime(), "diff", diff, "extraDays", extraDays, "delayFee", delayFee);
