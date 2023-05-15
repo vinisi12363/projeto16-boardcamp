@@ -1,52 +1,29 @@
 import { db } from "../config/connectdbConfig.js";
 
-async function searchRentals(params){
-      const   { customerId,
-      gameId,
-      order,
-      offset,
-      limit,
-      desc,
-      status,
-      startDate} = params
-
-      try{db.query(`SELECT 
-            rentals.id,
-            rentals."customerId",
-            rentals."gameId",
-            TO_CHAR(rentals."rentDate", 'YYYY-MM-DD') AS "rentDate",
-            rentals."daysRented",
-            TO_CHAR(rentals."returnDate", 'YYYY-MM-DD') AS "returnDate",
-            rentals."originalPrice",
-            rentals."delayFee",
-            JSON_BUILD_OBJECT('id', customers.id, 'name', customers.name) AS customer,
-            JSON_BUILD_OBJECT('id', games.id, 'name', games.name) AS game
-          FROM 
-            rentals
-          INNER JOIN 
-            customers ON rentals."customerId" = customers.id
-          INNER JOIN 
-            games ON rentals."gameId" = games.id
-        `) }catch (err){
-          res.status(500).send(err.message)
-        }
-}
-
 
 export async function getRentals(req, res) {
   
     try {
-      const { customerId, gameId, order, offset, limit, desc, status, startDate } = req?.query;
-      const rentals = await searchRentals({
-        customerId,
-        gameId,
-        order,
-        offset,
-        limit,
-        desc,
-        status,
-        startDate,
-      });
+
+      const rentals = await db.query(`SELECT 
+      rentals.id,
+      rentals."customerId",
+      rentals."gameId",
+      TO_CHAR(rentals."rentDate", 'YYYY-MM-DD') AS "rentDate",
+      rentals."daysRented",
+      TO_CHAR(rentals."returnDate", 'YYYY-MM-DD') AS "returnDate",
+      rentals."originalPrice",
+      rentals."delayFee",
+      JSON_BUILD_OBJECT('id', customers.id, 'name', customers.name) AS customer,
+      JSON_BUILD_OBJECT('id', games.id, 'name', games.name) AS game
+    FROM 
+      rentals
+    INNER JOIN 
+      customers ON rentals."customerId" = customers.id
+    INNER JOIN 
+      games ON rentals."gameId" = games.id
+    `)
+      console.log("GET RENTALS", rentals)
       res.status(200).send(rentals);
     } catch (error) {
       console.error(error);
@@ -169,31 +146,26 @@ export async function finalizeRentals(req, res) {
   }
 }
 
-export async function calculateRentals(id, returnDate, delayFee) {
-        try{
-          const result = await client.query(
-            'UPDATE rentals SET "returnDate"=$1, "delayFee"=$2 WHERE id=$3 RETURNING *',
-            [returnDate, delayFee, id]
-          )
-          return result.rows[0]
-        } catch (err) {
-          res.status(500).send(err.message)
-        }
-}
-
-
 export async function deleteRentalsById(req, res) {
-    const {id} =req.params;
-    try {
-      const rentalData = await db.query (`SELECT * FROM rentals WHERE id=$1`, [id])
-      if (!rentalData.rows.length) return res.status(404).send("Rental not found");
+  const { id } = req.params;
+  console.log(id);
+  try {
+    const rentalData = await db.query(`SELECT * FROM rentals WHERE id = $1`, [id]);
+    
+    if (!rentalData.rows.length) {
+      return res.status(404).send("Rental not found");
+    }
 
-      if(rentalData.rows[0].returnDate !== null) {
-        await db.query("DELETE * FROM rentals where id = $1", [id])
-      }else{
-        return res.status(400).send("erro ao tentar excluir um rental")
-      }
-      res.status(200)
-    }catch(err){res.status(500).send(err.message)}
+
+    if (rentalData.rows[0].returnDate !== null) {
+      await db.query("DELETE FROM rentals WHERE id = $1;", [id]);
+      res.status(200).send("Rental deleted successfully");
+    } else {
+      res.status(400).send("Cannot delete an ongoing rental");
+    }
+  } catch (err) {
+    res.status(500).send(err.message);
+  }
 }
+
 
