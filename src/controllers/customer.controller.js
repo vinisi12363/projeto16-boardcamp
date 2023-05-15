@@ -21,7 +21,7 @@ export async function getCustomersById(req, res) {
         const {id}=req.params
         if (!id) return res.status(404).send('error')
         
-        const customers = await db.query(queryBuilder('customers', id))
+        const customers = await db.query(`SELECT  id, name, phone , cpf, TO_CHAR(birthday, 'YYYY-MM-DD') AS birthday  FROM  customers`)
         console.log (customers)
         if(customers === [] || customers.rows.length===0){
             return res.status(404).send('error')

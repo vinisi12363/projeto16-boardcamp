@@ -1,6 +1,6 @@
 
 export default function validateGame(schema) {
- 
+    console.log ('dentro do validateGame')
     return (req, res, next) => {
         const { stockTotal, pricePerDay, name, image } = req.body
         if (!stockTotal || !pricePerDay || !name || !image) return res.status(400)
