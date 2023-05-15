@@ -84,10 +84,10 @@ export async function updateCustomers(req, res) {
 
         if (name.length === 0 || name === '' || !id) return res.status(400)
 
-        const customerData = await db.query(`SELECT * FROM customers WHERE id = '${id}'`)
-        console.log("customer dentro do update:  ", customerData)
-        console.log("CUSTOMER CPF", customerData.rows[0].cpf)
-        if (customerData.rows.length>0 && cpf === customerData.rows[0].cpf){
+        const cpfChecker = await db.query(`SELECT id ,cpf FROM customers WHERE CPF = '${cpf}'`)
+     
+        
+        if ((cpfChecker.rows[0].cpf === cpf && cpfChecker.rows[0].id === id) || (!cpfChecker.length)){
                 
             await db.query(`
             UPDATE customers SET

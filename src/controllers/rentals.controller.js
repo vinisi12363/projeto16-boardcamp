@@ -130,18 +130,12 @@ export async function finalizeRentals(req, res) {
 
     const diff = Math.abs(today.getTime() - rentDate.getTime());
 
-    const extraDays = Math.abs(diff / oneDay); 
+    let  extraDays = -1;
+    extraDays += Math.abs(diff / oneDay); 
+      
+    delayFee = Math.max(0, ( rentalInfo.rows[0].daysRented - extraDays ) * gameData.rows[0].pricePerDay); 
     
-    let delayFee = null
-    
-       
-      delayFee = Math.max(0, ( rentalInfo.rows[0].daysRented - extraDays ) * gameData.rows[0].pricePerDay); 
-    
-    
-
-    
-    console.log("oneDay", oneDay, "today.getTime()", today.getTime(), "rentDate.getTime()", rentDate.getTime(), "today.getTime() - rentDate.getTime()", today.getTime() - rentDate.getTime(), "diff", diff, "extraDays", extraDays, "delayFee", delayFee);
-
+  
     await db.query('UPDATE rentals SET "returnDate"=$1, "delayFee"=$2 WHERE id=$3 RETURNING *', [today, delayFee, id]);
 
     try {
