@@ -23,8 +23,8 @@ export async function getRentals(req, res) {
     INNER JOIN 
       games ON rentals."gameId" = games.id
     `)
-      console.log("GET RENTALS", rentals)
-      res.status(200).send(rentals);
+     
+      res.status(200).send(rentals.rows);
     } catch (error) {
       console.error(error);
       res.status(500).json({ message: "Internal server error" });
