@@ -69,20 +69,20 @@ export async function insertCustomers(req, res) {
 
 
 export async function updateCustomers(req, res) {
+    try {
     const { id } = req.params
     const { birthday, cpf, name, phone } = req.body
     if(!birthday || !cpf || !name || !phone) return res.status(400)
     if (birthday === '' || cpf=== '' || phone==='' || name === '') return res.status(400)
 
-    try {
-
+        if (name.length === 0 || name === '' || !id) return res.status(400)
         const customerData = await db.query(`SELECT * FROM customers WHERE id = '${id}'`)
         
         const cpfChecker = await db.query(`SELECT * from customers where cpf = '${cpf}'`)
         
         if (cpfChecker && cpfChecker.rows[0].id !== id) return res.status(409).send("cpf already in use")
-        
-         if (customerData.rows.length>0){
+       
+        if (customerData.rows.length>0){
                 
             await db.query(`
             UPDATE customers SET
