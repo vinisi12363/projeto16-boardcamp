@@ -12,8 +12,8 @@ export async function getGames(req, res) {
 }
 export async function insertGames(req, res) {
     try {
-         const { stockTotal, pricePerDay, name, image } = req.body
-
+        const { stockTotal, pricePerDay, name, image } = req.body
+        if(!name.length || name === '' || name === null) return res.status(400).send("name is oncorrect")
 
         const gameData = await db.query(`SELECT * FROM games WHERE name = '${name}'`)
         console.log ('GAME DATA', gameData)
