@@ -19,12 +19,12 @@ export async function getCustomersById(req, res) {
 
     try { 
         const {id}=req.params
-        if (!id) return res.status(400).send('error')
+        if (!id) return res.status(404).send('error')
         
         const customers = await db.query(queryBuilder('customers', id))
         console.log (customers)
         if(customers === [] || customers.rows.length===0){
-            return res.status(400).send('error')
+            return res.status(404).send('error')
         } else {
             res.status(200).send(customers.rows[0])
         }
